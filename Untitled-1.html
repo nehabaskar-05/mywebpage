@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page with Confetti</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: lightyellow;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            position: relative; /* For positioning the canvas */
+            overflow: hidden; /* Hide overflow to keep it clean */
+        }
+
+        #textContainer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: green;
+            font-size: 100px; /* Large font size */
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: lightblue;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: deepskyblue;
+        }
+
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+
+        #welcomeMessage {
+            display: none; /* Hide welcome message initially */
+        }
+
+        canvas {
+            position: absolute; /* Position the canvas above other content */
+            top: 0;
+            left: 0;
+            pointer-events: none; /* Allow clicks through the canvas */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="name" placeholder="Enter your name" required>
+        <input type="number" id="age" placeholder="Enter your age" required>
+        <button id="loginButton" onclick="login()">Login</button>
+    </div>
+
+    <div id="textContainer">
+        <h1>Dadhi</h1>
+    </div>
+
+    <div id="welcomeMessage">
+        <h1>Welcome!</h1>
+        <p>Thank you for logging in!</p>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function login() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            if (name && age) {
+                // Display the text
+                document.getElementById('textContainer').style.display = 'flex';
+                // Hide the login form
+                document.getElementById('loginForm').style.display = 'none';
+                // Launch confetti
+                launchConfetti();
+
+                // Show the welcome message after a delay
+                setTimeout(() => {
+                    document.getElementById('welcomeMessage').style.display = 'block';
+                    document.getElementById('textContainer').style.display = 'none'; // Optionally hide "Dadhi"
+                }, 3000); // Adjust the time (in milliseconds) as needed
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        function launchConfetti() {
+            const colors = ['#FF0D00', '#00FF00', '#00D0FF', '#FF00D0', '#D0FF00', '#D0D0FF'];
+            const particles = [];
+            const particleCount = 200;
+
+            // Create confetti particles
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 5 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    gravity: Math.random() * 0.5 + 0.5,
+                    speed: Math.random() * 3 + 1,
+                    angle: Math.random() * 2 * Math.PI
+                });
+            }
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((particle, index) => {
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+
+                    // Update particle position
+                    particle.y += particle.gravity;
+                    particle.x += Math.cos(particle.angle) * particle.speed;
+
+                    // Reset particle if it goes off screen
+                    if (particle.y > canvas.height) {
+                        particles.splice(index, 1); // Remove particle from array
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: 0,
+                            radius: Math.random() * 5 + 2,
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            gravity: Math.random() * 0.5 + 0.5,
+                            speed: Math.random() * 3 + 1,
+                            angle: Math.random() * 2 * Math.PI
+                        });
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Adjust canvas size on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+</html>
